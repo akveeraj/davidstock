@@ -1,0 +1,98 @@
+/*
+
+Theme Name: Davidostick.co.uk Theme
+Version: 1.0
+Author: Patrick Johnson
+Author URL: www.clickbanx.co.uk
+Edit Date: 09/05/2012
+
+*/
+
+/* basics */
+
+body {
+  background:url('/bg2.gif') repeat-y;
+	font-family:"Times New Roman", Times, arial, helvetica, geneva, sans-serif;
+	font-size:9pt;
+	margin:0px;
+	text-align:center;
+	color:#652501;
+	line-height:1.6em;
+}
+
+form { margin:0; }
+
+a {
+  text-decoration:none;
+	color:;
+}
+
+::-moz-selection {
+  background:#333333;
+	color:#ffffff;
+}
+
+::selection {
+  background:#333333;
+	color:#ffffff;
+}
+
+/* main body */
+
+.mainbody {
+  display:table;
+	width:1024px;
+	height:auto;
+}
+
+.leftnavholder{
+  display:table;
+  width:201px;
+	height:500px;
+	background:#663300;
+	float:left;
+}
+
+.leftnav {
+  display:block;
+}
+
+.maincontent {
+  display:block;
+	width:823px;
+	float:left;
+}
+
+.navlogo {
+  display:block;
+	width:137px;
+	height:109px;
+	background:url('/logo1.gif');
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:20px;
+	margin-top:25px;
+	clear:both;
+}
+
+.navlink a {
+  display:block;
+	clear:both;
+	margin-left:10px;
+	text-align:left;
+	padding-left:12px;
+	margin-bottom:9px;
+}
+
+.content_space_long {
+  display:block;
+	width:100px;
+	height:300px;
+	clear:both;
+}
+
+.template_footer {
+  display:block;
+	padding:10px;
+	text-align:centre;
+}

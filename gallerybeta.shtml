@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>David Ostick Design Gallery</title>
+
+<link rel='stylesheet' type='text/css' href='/css/template.css' />
+<link rel='stylesheet' type='text/css' href='/css/content.css'  />
+
+</head>
+
+<body>
+
+ <div class='mainbody'>
+	
+<!-- start template -->
+	
+	
+	<div class='leftnavholder'><div class='leftnav'><!--#include file="includes/leftnav.asp"--></div></div>
+	<div class='maincontent'>
+	
+	<!--#include file="includes/gallerycontent.asp"-->
+	
+	</div>
+	
+<!-- end template -->
+
+</div>
+
+<!--#include file="includes/footer.asp"-->
+
+
+
+
+</body>
+</html>
+

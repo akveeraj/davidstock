@@ -1,0 +1,74 @@
+<%
+
+'------------------If your site is hosted by another site then change your path in the DBQ value below i.e. in place of Server.MapPath("/SmartReferrer.mdb") type in Server.MapPath("/Your_site_path/SmartReferrer.mdb")-----------
+
+
+strDBRef =  "DRIVER={Microsoft Access Driver (*.mdb)};DBQ=" & Server.MapPath("/SmartReferrer.mdb") & ";DefaultDir=" & Server.MapPath(".") & ";DriverId=25;FIL=MS Access;MaxBufferSize=512;PageTimeout=5"
+
+
+'--------------------------------------End of Database connection string ------------------------------------
+
+Dim DBConnRef,strDBRef,strDateRef,strURLRef,strReferrer,varRID,varRefID,varDate,varDate1,varDiff,varDiff1,varDay,varWeek,rsRID,rsDate,rsDay,rsWeek,rsRefID
+strDateRef=CDate(Date)
+strReferrer=trim(Request.servervariables("HTTP_REFERER"))
+strURLRef=trim("http://" & Request.servervariables("HTTP_HOST") & Request.servervariables("URL"))
+If strReferrer="" then strReferrer="Unknown/Direct"
+Set DBConnRef = Server.CreateObject("ADODB.Connection")
+DBConnRef.Open strDBRef
+set rsRID=DBConnRef.execute("exec selsp_update_referrer_rid '" & strURLRef & "'")
+IF not rsRID.eof then
+	varRID=rsRID(0)
+	varDate=rsRID(1)
+	rsRID.close
+	set rsRID=Nothing
+	varDiff1=Datediff("d",varDate,strDateRef)
+	If varDiff1>0 and Instr(Application("SRUpdate"),"," & CStr(varRID) & ",")=0 then 
+		set rsDay=DBConnRef.execute("exec selsp_update_referrer '" & varRID & "','" & varDate & "'")
+		If not rsDay.eof then 
+			varDay=rsDay(0)
+			If (varDiff1>=7 OR DateDiff("ww",varDate,strDateRef)>0) then
+				If not rsDay.eof then 
+					rsDay.movenext
+					varWeek=rsDay(0)
+					rsDay.close
+					set rsDay=Nothing
+					DBConnRef.execute ("update tblReferrerPages set fldLastDay=" & varDay & ", fldLastWeek=" & varWeek & ", fldLastDate='" & varDate & "',fldLastWeekDate='" & varDate & "' where fldRID=" & varRID)
+				End if
+			else 
+				DBConnRef.execute ("update tblReferrerPages set fldLastDay=" & varDay & ",fldLastDate='" & varDate & "' where fldRID=" & varRID)
+			End if
+		Else
+			rsDay.close
+			set rsDay=Nothing
+		End if
+		Application("SRUpdate")=Application("SRUpdate") & "," & varRID & ","
+	END if
+	set rsRefID=DBConnRef.execute("exec selsp_refid '" & strReferrer & "','" & varRID & "'")
+	If not rsRefID.eof then
+		varRefID=rsRefID(0)
+		varDate=rsRefID(1)
+		rsRefID.close
+		set rsRefID=Nothing
+		varDiff=DateDiff("d",varDate,strDateRef)
+		If (varDiff=0) then
+			DBConnRef.execute("update tblReferrer set fldLastHit='" & strDateRef & "',fldHits=fldHits+1,fldWeekHits=fldWeekHits+1,fldDayHits=fldDayHits+1 where fldRefID=" & varRefID)
+		else
+			If (varDiff>=7 OR DateDiff("ww",varDate,strDateRef)>0) then
+				DBConnRef.execute("update tblReferrer set fldLastHit='" & strDateRef & "',fldHits=fldHits+1, fldWeekHits=1,fldDayHits=1 where fldRefID=" & varRefID)
+			else 
+				DBConnRef.execute("update tblReferrer set fldLastHit='" & strDateRef & "',fldHits=fldHits+1,fldWeekHits=fldWeekHits+1,fldDayHits=1 where fldRefID=" & varRefID)
+			End if
+		End if
+	else 
+		rsRefID.close
+		set rsRefID=Nothing
+		DBConnRef.execute ("insert into tblReferrer (fldRID,fldReferrer,fldLastHit,fldHits,fldDayHits,fldWeekHits) values (" & varRID & ",'" & strReferrer & "','" & strDateRef & "',1,1,1)")
+	End if
+Else
+	rsRID.close
+	set rsRID=Nothing
+END if
+
+DBConnRef.Close
+Set DBConnRef = nothing
+%>

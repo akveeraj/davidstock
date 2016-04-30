@@ -1,0 +1,178 @@
+<%
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 
+// ' File Name : BuildCircuit.framework
+// ' Created   : 25/11/2011
+// ' Developer : Patrick Johnson, Clickbanx Limited. www.clickbanx.co.uk
+// ' Function  : Fetches the template file of a requested circuit
+// 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  fb_Version = "7.0.5"
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Define Variables
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Start_Query   = Request.Querystring
+  fb_Query      = Request.Querystring
+	fb_Query      = UrlDecode( fb_Query )
+	fb_Query      = Replace( fb_Query, ";", vbcrlf )
+	'fb_Query      = Replace( fb_Query, "|", vbcrlf )
+	fb_Output     = ParseCircuit( "output", fb_Query )
+	fb_Extension  = ParseCircuit( "ext", fb_Query )
+	fb_Circuit    = ParseCircuit( "source", fb_Query ) 
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Fetch file name and folder
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  If Instr( fb_Circuit, "." ) > 0 Then
+	 
+	  fb_Array  = Split( fb_Circuit, "." )
+		fb_File   = fb_Array( 0 )
+		fb_Folder = fb_Array( 1 )
+	
+	End If
+	
+	If fb_Circuit = "" Then
+	
+		fb_FullPath = Default_Folder_Path & Default_Prefix & Default_Circuit & "." & Application_Language
+		Response.ContentType = "text/html"
+		
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		
+	Else
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  
+	Select Case( fb_Folder )
+	
+	  Case "view", "View", "VIEW"
+		
+			fb_FullPath           = Content_Folder_Path & Content_Prefix & fb_File & "." & Application_Language
+		  Response.ContentType  = "text/html"
+		
+		Case "actions", "Actions", "ACTIONS"
+		
+		  fb_FullPath           = Actions_Folder_Path & Actions_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+			
+		Case "controls", "Controls", "CONTROLS"
+		
+		  fb_FullPath           = Ctrl_Folder_Path & Ctrl_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+			
+		Case "admin", "Admin", "ADMIN"
+		
+		  fb_FullPath           = Admin_Folder_Path & Admin_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+		
+		Case "tools", "Tools", "TOOLS"
+		  
+			fb_FullPath           = Tools_Folder_Path & Tools_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+			
+		Case "account", "Account", "ACCOUNT"
+		
+		  fb_FullPath           = Account_Folder_Path & Account_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+		
+		Case "modal", "Modal", "MODAL"
+		  
+			fb_FullPath           = Modal_Folder_Path & Modal_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+			
+		Case "inbox", "Inbox", "INBOX"
+		  
+			fb_FullPath           = Inbox_Folder_Path & Inbox_Prefix & fb_File & "." & Application_Language 
+			Response.ContentType  = "text/html"
+			
+	  Case "help", "Help", "HELP"
+		  
+			fb_FullPath           = Help_Folder_Path & Help_Prefix & fb_File & "." & Application_Language
+			Response.ContentType  = "text/html"
+			
+		Case Else
+		
+		  fb_FullPath           = Default_Folder_Path & Default_Prefix & Default_Circuit & "." & Application_Language
+			Response.ContentType  = "text/html"
+	
+	End Select 
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  End If
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Check File Exists
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Function CheckFile ()
+	
+	  Set FileSys  = CreateObject("Scripting.FileSystemObject")
+		CFObject     = FileSys.FileExists( Server.MapPath( fb_FullPath ) )
+		
+		If CFObject  = True or CFObject = true Then
+		  FilePassed = 1
+		Else
+		  FilePassed = 0
+		End If
+		
+		CheckFile    = FilePassed
+		Set FileSys  = Nothing
+		
+	End Function
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Load File
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Sub LoadCircuit ( fb_Circuit )
+	
+	  n_FileName   = LCase( fb_FullPath )
+		n_ServerName = Request.ServerVariables( "server_name" )
+		n_ServerPort = Request.ServerVariables( "server_port" )
+		
+		If CheckFile = 0 Then
+		
+		  WriteError = "<link href='" & Fuse_CSS_Path & "style.css?v=" & Timer() & Rnd() & "' rel='stylesheet' type='text/css'/>" & _
+			             "<div class='fb_big_error_box'>" & Chr(13) & _
+									 "<span class='fb_big_error_text'>" & Chr(13) & _
+									 "The requested file `<span class='fb_big_error_text_red'>" & fb_File & "</span>` could not be found." & Chr(13) & _
+									 "</span>" & Chr(13) & _
+									 "<span class='fb_framework_info'>Fusebox Framework" & fb_Version & " at " & n_ServerName & " on Port: " & n_ServerPort & "</span>" & Chr(13) & _
+									 "</div>"
+									 Response.Write WriteError
+		
+		Else
+		
+		  If CheckFile = 1 Then
+			
+			  Set GetFile = CreateObject("Scripting.FileSystemObject")
+				If GetFile.FileExists( Server.MapPath( n_FileName )) = true or GetFile.FileExists( Server.MapPath( n_FileName )) = True Then
+				  Server.Execute( n_FileName )
+				End If
+				
+				Set GetFile = Nothing
+			
+			End If
+		
+		End If
+	
+	End Sub
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+%>

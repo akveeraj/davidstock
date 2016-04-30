@@ -1,0 +1,1 @@
+<div class='template_footer'><img src='/badge.gif'/><br/><span class='footer_copyright'>Oxford & London. England. Tel: UK-(0)774-786-8740 </span></div>

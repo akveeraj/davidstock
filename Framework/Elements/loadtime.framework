@@ -1,0 +1,23 @@
+
+<%
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 
+// ' File Name : LoadTime.framework
+// ' Created   : 29/03/2012
+// ' Developer : Patrick Johnson, Clickbanx Limited. www.clickbanx.co.uk
+// ' Function  : Displays the loadtime of the page [ good for debugging ]
+// 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+	Sub LoadTime()
+	  
+		StartTime = Timer
+	  EndTime   = Timer
+	
+	  TimeTaken = FormatNumber( EndTime - StartTime, 4 )
+	  Response.Write "<span class='loadtime'>This page took " & TimeTaken & " seconds to process</span>"
+	
+	End Sub
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%>

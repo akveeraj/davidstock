@@ -1,0 +1,257 @@
+<%
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 
+// ' File Name : miscfunctions.framework
+// ' Created   : 02/12/2011
+// ' Developer : Patrick Johnson, Clickbanx Limited. www.clickbanx.co.uk
+// ' Function  : Holds all the miscelenious functions for the framework
+// 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Parse string data
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Public Function ParseCircuit( FieldName, Response )
+	  
+		Collection = Split( Response, Chr(13) )
+		
+		For i = LBound( Collection ) To UBound( Collection )
+		
+		  Item = Replace( Collection( i ), Chr(10), "" )
+			If Instr( Item, FieldName & ":" ) = 1 Then
+			  ParseCircuit = Right( Item, Len( Item ) - Len( FieldName ) - 1 )
+			Exit For
+			End If
+		Next
+	
+	End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Strip Special Characters
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Function StripSpecialChar(inFileName)
+	dim sOut,strorigFileName,arrSpecialChar,intCounter
+	 arrSpecialChar  = Array("%20","%","#","+","(",")","&","$","!","*","<",">","?","/","|","\", vbcrlf)
+	 strorigFileName = inFileName
+	 intCounter = 0
+
+	 Do Until intCounter = 18
+	  sOut = replace(strorigFileName,arrSpecialChar(intCounter)  ,"")
+	  intCounter = intCounter + 1
+	  strorigFileName = sOut
+	  'response.write strorigFileName
+	 Loop
+	 StripSpecialChar = strorigFileName
+	 
+end Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Decode Url
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+  Public Function UrlDecode(StrString)
+		
+		For lngPos = 1 To Len(strString)
+    	If Mid(strString, lngPos, 1) = "%" Then
+            strUrlDecode = strUrlDecode & Chr("&H" & Mid(strString, lngPos + 1, 2))
+            lngPos = lngPos + 2
+        elseif Mid(strString, lngPos, 1) = "+" Then
+            strUrlDecode = strUrlDecode & " "
+        Else
+            strUrlDecode = strUrlDecode & Mid(strString, lngPos, 1)
+        End If
+    Next
+    UrlDecode = strUrlDecode
+		
+	End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Encode URL
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	Public Function UrlEncode(StrString)
+	
+    strEncoded=Server.URLEncode(strString)
+	  URLEncode=strEncoded
+		
+	End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Random Code
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Sub RandomCode( Length )
+	  
+		Code = Timer()&Rnd()
+		Code = Sha1( Code )
+		Code = Left( Code, Length )
+	  Session("rcode") = Code
+		Response.Write Code
+		
+	End Sub
+	
+
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Send Persits Mail
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Sub SendPersitsMail( MailBody, MailSubject, MailIsHtml, MailRecipient )
+	  
+		Set SendMail = Server.CreateObject("Persits.MailSender")
+		
+		MailBody = MailBodyStart & MailBody & MailBodyEnd
+		
+		SendMail.Host      = Email_Server
+		SendMail.Port      = Email_Port
+		SendMail.Username  = Email_Username
+		SendMail.Password  = Email_Password
+		SendMail.From      = Email_Username
+		SendMail.FromName  = Email_FromName
+		SendMail.AddAddress  MailRecipient
+		SendMail.Subject   = MailSubject
+		SendMail.Body      = MailBody
+		SendMail.ISHTML    = MailIsHTML
+		SendMail.Send
+		
+		Set SendMail = Nothing
+		
+	End Sub
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Send Mail
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Sub SendMessage( MailBody, MailSubject, MailIsHTML, MailRecipient )
+	
+	  RequiredComponent = RequiredComponent
+		
+		Select Case( RequiredComponent )
+		  
+			Case( "1" )
+			
+			  Response.Write "CDONTS IS NOT YET IMPLEMENTED, USE PERSITS (2)"
+			
+			Case( "2" )
+			
+			  Call SendPersitsMail( MailBody, MailSubject, MailIsHtml, MailRecipient )
+			
+			Case Else
+			
+			Response.Write "Sorry, `RequiredComponent is NULL in email.config`"
+			
+		End Select
+	
+	End Sub
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Calculate Age + years / days active
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	Function CalculateAge(DateOfBirth)
+	  TodaysDate = Date()
+		intAge     = DateDiff( "yyyy", DateOfBirth, TodaysDate )
+		If TodaysDate < DateSerial(Year(TodaysDate), Month(DateOfBirth), Day(DateOfBirth)) Then
+		  intAge   = intAge - 1
+		End If
+		CalculateAge = intAge
+	End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+	Function CalcDaysYear(JoinDay, JoinMonth, JoinYear)
+	
+	  JoinDate    = JoinDay & "/" & JoinMonth & "/" & JoinYear
+		JoinDay     = JoinDay
+		JoinMonth   = JoinMonth
+		JoinYear    = JoinYear
+		TodaysDate  = Date
+		
+		MonthDiff   = DateDiff( "m", JoinDate, TodaysDate )
+		DayDiff     = DateDiff( "d", JoinDate, TodaysDate )
+		YearDiff    = DateDiff( "yyyy", JoinDate, TodaysDate )
+		
+		If DayDiff = 0 Then
+
+		  intDate = " Today"
+
+		ElseIf DayDiff = 1 Then
+
+		  intDate = " Yesterday"
+
+		Elseif DayDiff > 1 AND DayDiff < 31 Then
+
+		  intDate = DayDiff & " day/s ago"
+
+		ElseIf DayDiff = 31 or DayDiff = 30 or DayDiff < 30 Then
+		  
+			intDate = DayDiff & " day/s ago"
+		
+		ElseIf DayDiff = 364 or DayDiff < 364 Then
+		  
+			intDate = MonthDiff & " month/s ago"
+		
+		Elseif DayDiff > 364 Then
+		  
+			intDate = YearDiff & " year/s ago"
+		
+		End If
+		 
+		 CalcDaysYear = intDate
+	
+	End Function
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Average Stars function
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Function CreateAvgStars( strData, RatingCount )
+	
+	  If strData = 0 or strData = "" Then
+		  StarImg  = "<img src='/application/library/media/ratings/0.png'/>"
+		ElseIf strData > 5 Then
+		  StarImg  = "<img src='/application/library/media/ratings/5.png' title='5 stars from " & RatingCount & " ratings'/>"
+		Else
+		  StarImg  = "<img src='/application/library/media/ratings/" & strData & ".png' title='" & strData & " stars from " & RatingCount & " ratings'/>"
+	  End If
+		
+		CreateAvgStars = StarImg
+		
+	End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Replace Single Quotes for SQL
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Function QuoteReplace(strValue)
+    QuoteReplace = Replace(strValue, "'", "''")
+  End Function 
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Calculate Vat
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Function CalcVat( VatCode, CartValue )
+	
+	  CalcVat = FormatNumber( CartValue / 100 * VatCode, 2 )
+	
+	End Function
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Cookie Test
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Function CookiesOn( TestCookie )
+		
+		CheckCookie = Request.Cookies("testcookie")
+		
+		If CheckCookie = "" Then
+		  CookiesOn = 0
+		Else
+		  CookiesOn = 1
+		End If
+		
+	End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%>

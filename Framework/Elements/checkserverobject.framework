@@ -1,0 +1,26 @@
+<%
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 
+// ' File Name : CheckServerObject.Framework
+// ' Created   : 24/11/2011
+// ' Developer : Patrick Johnson, Clickbanx Limited. www.clickbanx.co.uk
+// ' Function  : Checks if a server object is installed on server machine and returns results
+// 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ' Define Variables
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Function CheckServerObject(ProgId)
+	  On Error Resume Next
+		Set tmpObject = Server.CreateObject(ProgId)
+	  If Err.Number = 0 Then
+		  CheckServerObject = True
+		Else
+		  CheckServerObject = False
+		End If
+		Set tmpObject = Nothing
+
+  End Function
+	
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+%>
